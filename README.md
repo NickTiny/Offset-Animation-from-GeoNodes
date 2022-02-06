@@ -2,7 +2,7 @@
 Offset Animation from GeoNodes objects
 
 An addon for Blender that lets you distribute and offset the animations of characters from Geomotry Nodes Data.
-This addon requires Blender 3.0.0 or later.
+This addon requires Blender 3.0.0+
 
 ![Example-Final-Product](https://user-images.githubusercontent.com/86638335/152693808-32e9d2d6-5ea0-4225-82e6-990ec366608b.gif)
 
