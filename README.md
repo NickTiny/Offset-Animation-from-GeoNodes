@@ -5,8 +5,10 @@ An addon for Blender that lets you distribute and offset the animations of chara
 This addon requires Blender 3.0+
 
 ![Example-Final-Product](https://user-images.githubusercontent.com/86638335/152693808-32e9d2d6-5ea0-4225-82e6-990ec366608b.gif)
+
 # Release
  Download the [Latest Release](https://github.com/NickTiny/Offset-Animation-from-GeoNodes/releases/download/Pre-Release/Offset-GeoNodes-V-0-1.py)
+ Get the [Example Blend File](https://github.com/NickTiny/Offset-Animation-from-GeoNodes/releases/download/Pre-Release/GNOA-Example-File.blend)
 
 
 # Usage
