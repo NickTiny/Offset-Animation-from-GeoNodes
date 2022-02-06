@@ -17,7 +17,7 @@ bl_info = {
     "description" : "",
     "blender" : (3, 0, 0),
     "version" : (0, 0, 1),
-    "location" : "View 3D > Sidebar > Edit Tab",
+    "location" : "View 3D > Sidebar > Edit Tab > GN Offset",
     "warning" : "This addon is still under development",
     "category" : "Animation"
 }
@@ -30,7 +30,7 @@ from collections import  defaultdict
 classes = [] 
 
 class offset_animation_operator(bpy.types.Operator): #This operator takes a list of vectors and duplicates a target object to those vectors with offset NLA tracks.
-    """tool tip label""" #Tooltip label
+    """Duplcate source object hierarchy onto each vertex of the target object and offset animations.""" #Tooltip label
     bl_idname = "view3d.offset_anim_geonodes_op" #This name blender uses to call this operator from another operator
     bl_label = "Offset from GeoNodes" #User facing name for this operator
 
@@ -66,45 +66,44 @@ class offset_animation_operator(bpy.types.Operator): #This operator takes a list
             bpy.context.view_layer.objects.active = target_obj #Select object to copy
             bpy.ops.object.select_hierarchy(direction='CHILD', extend=True) #Select object children
             bpy.ops.object.duplicate_move_linked(OBJECT_OT_duplicate={"linked":True, 
-            "mode":'TRANSLATION'}, TRANSFORM_OT_translate={"value":(0, 0, 0)}) #duplicate using operator is slow should be replaced with data block based duplication.
-            bpy.ops.transform.translate(value=(x, y, z)) #translate new objects to vectors from loop
+            "mode":'TRANSLATION'}, TRANSFORM_OT_translate={"value":(0, 0, 0)}) #Bpy.ops is slow should be replaced with data block method.
+            bpy.ops.transform.translate(value=(x, y, z)) #Translate new objects to vectors from loop
             bpy.ops.object.select_hierarchy(direction='PARENT', extend=False) #select parent object only
             active_obj = bpy.context.object #definitions for NLA edits
-            action = active_obj.animation_data.action
+            action = active_obj.animation_data.action #use of bpy.ops is needed to edit NLA Tracks
             track = active_obj.animation_data.nla_tracks.new()
             track.strips.new(action.name, action.frame_range[0], action) #pushdown animation to NLA tracks
             active_obj.animation_data.action = None
-            active_obj.animation_data.nla_tracks['NlaTrack'].strips['Action'].scale = (1 if v==0 else ((.1*r)*v))
-            active_obj.animation_data.nla_tracks['NlaTrack'].strips['Action'].frame_start += x+y #offset NLA track
-            active_obj.animation_data.nla_tracks['NlaTrack'].strips['Action'].frame_end += x+y
-            bpy.context.view_layer.objects.active = source_obj #reselect geomoetry nodes object
-            #bpy.ops.object.select_all(action='DESELECT') 
+            active_obj.animation_data.nla_tracks['NlaTrack'].strips['Action'].scale = (1 if v==0 else ((.1*r)*v))  #Maths require improvement.
+            active_obj.animation_data.nla_tracks['NlaTrack'].strips['Action'].frame_start += x+y #offset NLA track start
+            active_obj.animation_data.nla_tracks['NlaTrack'].strips['Action'].frame_end += x+y #offset NLA track end
+            bpy.context.view_layer.objects.active = source_obj #Reselect target object 
         
-        return {"FINISHED"} #end of operation
+        return {"FINISHED"}
 classes.append(offset_animation_operator)
 
 class OffsetGeoNodesPanel(bpy.types.Panel): #This contains all UI elements.
-    """Keyframe custom properties on the PoseData Bone for setting up Pose Library"""
+    """Distribute Armatures and Objects based on a Geomotry Nodes Object"""
     bl_idname = "VIEW3D_PT_OGN_PNL"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
-    bl_category = "GNAO - DEV"
-    bl_label = "Geo-Nodes Anim-Offset"
+    bl_category = "GN Offset"
+    bl_label = "Geo Nodes Offset Animation"
     bl_context = "objectmode"
 
 
     def draw(self, context):
         scene = bpy.context.scene
-        self.layout.prop(scene.random_scale, "propertyDisplayTarget")
-        self.layout.prop(scene.target_obj, "propertyDisplayTarget") 
-        self.layout.prop(scene.source_obj, "propertyDisplayTarget")
-        self.layout.operator("view3d.offset_anim_geonodes_op")            
+        self.layout.prop(scene.random_scale, "propertyDisplayTarget") #User input's random scale 
+        self.layout.prop(scene.target_obj, "propertyDisplayTarget") #User inputs Target Object
+        self.layout.prop(scene.source_obj, "propertyDisplayTarget") #User inputs Source Object
+        self.layout.operator("view3d.offset_anim_geonodes_op") #Run Script           
 classes.append(OffsetGeoNodesPanel)
 
-class random_scale(bpy.types.PropertyGroup):
+class random_scale(bpy.types.PropertyGroup): #Define random scale value
     propertyDisplayTarget : bpy.props.FloatProperty(
         name = "Random Scale",
-        description="Enter an integer",
+        description="Amount of randomization of animation scale. 0 disables randmization.",
         default = 0,
         min = 0,
         max=2,
@@ -112,12 +111,12 @@ class random_scale(bpy.types.PropertyGroup):
         )
 classes.append(random_scale)
 
-class target_obj(bpy.types.PropertyGroup):
+class target_obj(bpy.types.PropertyGroup): #Define and store target objct
     propertyDisplayTarget: bpy.props.PointerProperty(name = "Target", type = bpy.types.Object)
     propertyDisplayUseActiveObject: bpy.props.BoolProperty(name = "Use Active")
 classes.append(target_obj)
 
-class source_obj(bpy.types.PropertyGroup):
+class source_obj(bpy.types.PropertyGroup): #Define and store source objct
     propertyDisplayTarget: bpy.props.PointerProperty(name = "Source", type = bpy.types.Object)
     propertyDisplayUseActiveObject: bpy.props.BoolProperty(name = "Use Active2")
 classes.append(source_obj)
