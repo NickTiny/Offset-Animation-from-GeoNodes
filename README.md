@@ -19,7 +19,7 @@ This addon requires Blender 3.0+
 # Purpose
 To explore methods of adjusting and distributing animated characters based on information retirived from Geomtry Nodes.
 
-# Example Uses
+# Examples
 
 Example with Characters
 
