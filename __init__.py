@@ -24,19 +24,17 @@ bl_info = {
 
 import bpy
 import random
-from collections import  defaultdict
 
 
 classes = [] 
 
-class offset_animation_operator(bpy.types.Operator): #This operator takes a list of vectors and duplicates a target object to those vectors with offset NLA tracks.
-    """Duplcate source object hierarchy onto each vertex of the target object and offset animations.""" #Tooltip label
+class offset_animation_operator(bpy.types.Operator):  #This operator takes a list of vectors and duplicates a target object to those vectors with offset NLA tracks.
+    """Duplicate source object hierarchy onto each vertex of the target object and offset animations.""" #Tooltip label.
     bl_idname = "view3d.offset_anim_geonodes_op" #This name blender uses to call this operator from another operator
-    bl_label = "Offset from GeoNodes" #User facing name for this operator
+    bl_label = "Offset from GeoNodes" #User facing name for operator.
 
     def execute(self, context):
-        #defintions for math
-        #definitions for objects
+        #Definitions for objects.
         source_obj = bpy.context.scene.target_obj.propertyDisplayTarget #Calling the source object defined by the user.
         target_obj = bpy.context.scene.source_obj.propertyDisplayTarget #Calling the target object defined by the user.
         obj = source_obj.evaluated_get(bpy.context.evaluated_depsgraph_get()).data #Get vector list from source object
@@ -45,8 +43,8 @@ class offset_animation_operator(bpy.types.Operator): #This operator takes a list
         
         
 
-        for index,vectors, in enumerate(vectors_list): #for each set of x,y,z vectors create a new object and move it to those corrdinates.
-            VectorList = [] #list of parsed x,y,z values
+        for index,vectors, in enumerate(vectors_list): #For each set of x,y,z vectors duplicate and move source object.
+            VectorList = [] #List of x,y,z values.
             for index,vector in enumerate(vectors):
                 if index == 0:
                     VectorList.append(vector)
@@ -54,36 +52,41 @@ class offset_animation_operator(bpy.types.Operator): #This operator takes a list
                     VectorList.append(vector)
                 if index == 2:
                     VectorList.append(vector)
+            #Define the x,y,z values.
             x = VectorList[0]
             y = VectorList[1]
-            z = VectorList[2] #define the x,y,z values
-            v = bpy.context.scene.random_scale.propertyDisplayTarget
+            z = VectorList[2]
+            #Defintions for math. 
+            v = bpy.context.scene.random_scale.propertyDisplayTarget #User input of random scale.
             a = 1
             b = 25
             r = random.randint(a,b)
-            bpy.ops.object.select_all(action='DESELECT') 
-            target_obj.select_set(True)
-            bpy.context.view_layer.objects.active = target_obj #Select object to copy
-            bpy.ops.object.select_hierarchy(direction='CHILD', extend=True) #Select object children
-            bpy.ops.object.duplicate_move_linked(OBJECT_OT_duplicate={"linked":True, 
+            #Copy adn move objects 
+            bpy.ops.object.select_all(action='DESELECT') #Deslect all
+            target_obj.select_set(True) #Select object to copy.
+            bpy.context.view_layer.objects.active = target_obj #Select object to copy.
+            bpy.ops.object.select_hierarchy(direction='CHILD', extend=True) #Select object's children.
+            bpy.ops.object.duplicate_move_linked(OBJECT_OT_duplicate={"linked":True, #Duplicate linked selected.
             "mode":'TRANSLATION'}, TRANSFORM_OT_translate={"value":(0, 0, 0)}) #Bpy.ops is slow should be replaced with data block method.
-            bpy.ops.transform.translate(value=(x, y, z)) #Translate new objects to vectors from loop
-            bpy.ops.object.select_hierarchy(direction='PARENT', extend=False) #select parent object only
-            active_obj = bpy.context.object #definitions for NLA edits
-            action = active_obj.animation_data.action #use of bpy.ops is needed to edit NLA Tracks
+            bpy.ops.transform.translate(value=(x, y, z)) #Translate new objects to vectors from loop.
+            bpy.ops.object.select_hierarchy(direction='PARENT', extend=False) #Select parent object only.
+            #Definitions for NLA Actions
+            active_obj = bpy.context.object 
+            action = active_obj.animation_data.action #Use of bpy.ops is needed to edit NLA Tracks.
             track = active_obj.animation_data.nla_tracks.new()
-            track.strips.new(action.name, action.frame_range[0], action) #pushdown animation to NLA tracks
+            #NLA Actions
+            track.strips.new(action.name, action.frame_range[0], action) #Pushdown animation to NLA tracks.
             active_obj.animation_data.action = None
-            active_obj.animation_data.nla_tracks['NlaTrack'].strips['Action'].scale = (1 if v==0 else ((.1*r)*v))  #Maths require improvement.
-            active_obj.animation_data.nla_tracks['NlaTrack'].strips['Action'].frame_start += x+y #offset NLA track start
-            active_obj.animation_data.nla_tracks['NlaTrack'].strips['Action'].frame_end += x+y #offset NLA track end
-            bpy.context.view_layer.objects.active = source_obj #Reselect target object 
+            active_obj.animation_data.nla_tracks['NlaTrack'].strips['Action'].scale = (1 if v==0 else ((.1*r)*v))  #Math needs improvement.
+            active_obj.animation_data.nla_tracks['NlaTrack'].strips['Action'].frame_start += x+y #Offset NLA track start.
+            active_obj.animation_data.nla_tracks['NlaTrack'].strips['Action'].frame_end += x+y #Offset NLA track end.
+            bpy.context.view_layer.objects.active = source_obj #Reselect target object.
         
         return {"FINISHED"}
 classes.append(offset_animation_operator)
 
-class OffsetGeoNodesPanel(bpy.types.Panel): #This contains all UI elements.
-    """Distribute Armatures and Objects based on a Geomotry Nodes Object"""
+class OffsetGeoNodesPanel(bpy.types.Panel):  #This contains all UI elements.
+    """Distribute Armatures and Objects based on a Geometry Nodes Object"""
     bl_idname = "VIEW3D_PT_OGN_PNL"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
@@ -94,16 +97,16 @@ class OffsetGeoNodesPanel(bpy.types.Panel): #This contains all UI elements.
 
     def draw(self, context):
         scene = bpy.context.scene
-        self.layout.prop(scene.random_scale, "propertyDisplayTarget") #User input's random scale 
-        self.layout.prop(scene.target_obj, "propertyDisplayTarget") #User inputs Target Object
-        self.layout.prop(scene.source_obj, "propertyDisplayTarget") #User inputs Source Object
+        self.layout.prop(scene.random_scale, "propertyDisplayTarget") #User input random scale. 
+        self.layout.prop(scene.target_obj, "propertyDisplayTarget") #User input Target Object.
+        self.layout.prop(scene.source_obj, "propertyDisplayTarget") #User input Source Object.
         self.layout.operator("view3d.offset_anim_geonodes_op") #Run Script           
 classes.append(OffsetGeoNodesPanel)
 
-class random_scale(bpy.types.PropertyGroup): #Define random scale value
+class random_scale(bpy.types.PropertyGroup): #Define random scale value.
     propertyDisplayTarget : bpy.props.FloatProperty(
         name = "Random Scale",
-        description="Amount of randomization of animation scale. 0 disables randmization.",
+        description="Amount of randomization of animation scale. 0 disables randomization.",
         default = 0,
         min = 0,
         max=2,
@@ -111,12 +114,12 @@ class random_scale(bpy.types.PropertyGroup): #Define random scale value
         )
 classes.append(random_scale)
 
-class target_obj(bpy.types.PropertyGroup): #Define and store target objct
+class target_obj(bpy.types.PropertyGroup): #Define and store target object.
     propertyDisplayTarget: bpy.props.PointerProperty(name = "Target", type = bpy.types.Object)
     propertyDisplayUseActiveObject: bpy.props.BoolProperty(name = "Use Active")
 classes.append(target_obj)
 
-class source_obj(bpy.types.PropertyGroup): #Define and store source objct
+class source_obj(bpy.types.PropertyGroup): #Define and store source object.
     propertyDisplayTarget: bpy.props.PointerProperty(name = "Source", type = bpy.types.Object)
     propertyDisplayUseActiveObject: bpy.props.BoolProperty(name = "Use Active2")
 classes.append(source_obj)
@@ -132,7 +135,8 @@ def unregister():
    for cls in reversed(classes):...
    del bpy.types.Scene.target_obj
    del bpy.types.Scene.source_obj 
-   del bpy.types.Scene.random_scale    
+   del bpy.types.Scene.random_scale
+
 if __name__ == "__main__":
     register()
         
