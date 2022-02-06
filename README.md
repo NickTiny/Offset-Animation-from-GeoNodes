@@ -14,29 +14,23 @@ This addon requires Blender 3.0.0 or later.
 5. Run the "Offset from GeoNodes" Operator.
 
 # Purpose
-To explore methods of adjusting  and distributingh animated characters based on information retirived from Geomtry Nodes.
+To explore methods of adjusting and distributing animated characters based on information retirived from Geomtry Nodes.
 
 # Example Uses
 
 Example with Characters
 
-https://user-images.githubusercontent.com/86638335/152694291-57966f1a-99cc-4a64-be4f-c50f74cc1896.mp4
+![Example-with-Characters](https://user-images.githubusercontent.com/86638335/152694387-7ae80235-0ddd-4845-9e95-feea2c560103.gif)
 
 
+Example with Scale Random
 
+![Random-Scale-Example](https://user-images.githubusercontent.com/86638335/152694401-8f2620b6-5839-4ae5-a282-756621dab635.gif)
 
 
 Example without Scale Random
 
 ![Example-Disable-Scale](https://user-images.githubusercontent.com/86638335/152693798-0f01d2f0-e012-4548-bda7-5294ccd1c7d0.gif)
-
-
-Example with Scale Random
-
-https://user-images.githubusercontent.com/86638335/152694302-cba6e0b9-ef2e-486d-9901-6e30159a9ada.mp4
-
-
-
 
 Adjust layout with geomotry nodes.
 
