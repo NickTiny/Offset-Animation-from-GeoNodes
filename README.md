@@ -12,7 +12,7 @@ This addon requires Blender 3.0.0 or later.
 5. Run the "Offset from GeoNodes" Operator.
 
 Example Uses
-/examples/Example-with-Characters.mp4
+<img src="/examples/Example-with-Characters.mp4" height="250px"> 
 
 
 #Next Steps
